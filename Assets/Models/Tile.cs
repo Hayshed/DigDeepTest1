@@ -9,6 +9,8 @@ using UnityEngine;
 //This is the kind of global shared information we should do this with
 public enum TileType { Air, Dirt, Stone, Ore }
 
+public enum BackgroundType { Air, Dirt}
+
 
 public class Tile {
 
@@ -21,6 +23,7 @@ public class Tile {
 
     //store the type of tile, by default be Air
     TileType type = TileType.Air;
+    BackgroundType backType = BackgroundType.Air;
 
     public TileType Type
     {

@@ -13,6 +13,8 @@ public class WorldController : MonoBehaviour {
 
     Dictionary<Tile, GameObject> tileGameObjectMap;
 
+    
+
     public Sprite airSprite;
     public Sprite dirtSprite;
 
@@ -20,7 +22,7 @@ public class WorldController : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	void OnEnable () {
         if (Instance != null)
         {
             Debug.LogError("There should never be two world controllers");
@@ -33,8 +35,19 @@ public class WorldController : MonoBehaviour {
         //instantiate our dictonary that tracks which GameObejct is rendering which Tile data
         tileGameObjectMap = new Dictionary<Tile, GameObject>();
 
+
+        
+
+        
+
+
+
+
+
         //randomise all the tiles in the world
-        World.RandomiseTiles();
+        //World.RandomiseTiles();
+
+        World.InitialiseTiles();
 
         //create a gameObject for each of our tiles
         for (int x = 0; x < World.Width; x++)
@@ -59,16 +72,7 @@ public class WorldController : MonoBehaviour {
                 // Add a sprite renderer to each tile GameObject
                 SpriteRenderer tile_sr = tile_go.AddComponent<SpriteRenderer>();
 
-                //lambda fun!!
-                //Register wants a a function(Tile), but
-                // OntileTypeChanged is a function (Tile and GameObject).
-                // so we just tell Register to accept it as if it was a function(Tile),
-                // and when it is time to run it, run it using the tile feed in in Tile.cs and the tile_go feed in here
-
-                //tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); } );
-
-                //Use this with a dictonary so we can unregister callbacks in the future
-                //Register our callback so that our GameObject gets called whenever the Tile data changes
+                
                 tile_data.RegisterTileTypeChangedCallback( OnTileTypeChanged);
 
                 //set the sprite depending on what kind of tile it is
@@ -98,6 +102,8 @@ public class WorldController : MonoBehaviour {
 		
 	}
 
+
+    
 
     //should be called whenever the type of a tile changes in the data,
     // so that the visual gameobjects can change to match
@@ -130,42 +136,13 @@ public class WorldController : MonoBehaviour {
     }
 
 
-    float randomiseTileTimer = 2f;
-
-	// Update is called once per frame
+   
 	void Update () {
-        randomiseTileTimer -= Time.deltaTime;
-
-        if(randomiseTileTimer < 0)
-        {
-            World.RandomiseTiles();
-            randomiseTileTimer = 2f;
-        }
+    
 		
 	}
 
-    //THIS IS AN EXAMPLE - NOT IN USE
-    void DestroyAllTileGameObjects() {
-        //this function might get called when we are changing floors/levels.
-        //we need to destroy all visual **GameObjects** -- but not the actual tile data!
-
-        
-        while (tileGameObjectMap.Count > 0) {   //keep going until the dictonary is empty
-            Tile tile_data = tileGameObjectMap.Keys.First();    //"using system.linq"   to get the First method for dictonary. Dictonaries are inherently unordered, but this lets us get
-            GameObject tile_go = tileGameObjectMap[tile_data];      //an arbitray key out, and we don't care about order and are removing them as we go so this works
-
-            //remove the pair from the map
-            tileGameObjectMap.Remove(tile_data);
-
-            //unregister the callback!
-            tile_data.UnRegisterTileTypeChangedCallback(OnTileTypeChanged);
-
-            //destroy the visual GameObject
-            Destroy(tile_go);
-        }
-        //presumably, after this function gets called, we'd be calling another function
-        //to build all the gameobjects for the next level etc
-    }
+  
 
 
 }

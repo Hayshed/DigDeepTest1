@@ -11,8 +11,8 @@ public class World {
     //The tile width and height of the world
     public int Width { get; protected set; }
     public int Height { get; protected set; }
+    public JobQueue jobQueue;
 
-    
 
 
     /// <summary>
@@ -21,6 +21,8 @@ public class World {
     /// <param name="height"> the height in tiles</param>
     /// </summary>
     public World(int width = 100, int height = 100){
+
+        jobQueue = new JobQueue();
 
         Width = width;
         Height = height;
@@ -41,6 +43,8 @@ public class World {
 
 
     }
+
+    
 
     public Tile GetTileAt(int x, int y)
     {
@@ -91,11 +95,27 @@ public class World {
         }
     }
 
+    public void InitialiseTiles() {
+        for (int x = 0; x < Width; x++) {
+            for (int y = 0; y < Height; y++) {
+                Tile t = GetTileAt(x, y);
+                if (y <=  3 * Height / 4) {
+                    t.Type = TileType.Dirt;
+                }
+                else {
+                    t.Type = TileType.Air;
+                }
+
+
+                
+                
+            }
+        }
+    }
 
 
 
-
-
+    
 
 
 }

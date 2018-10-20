@@ -20,14 +20,20 @@ public class MouseController : MonoBehaviour {
     Vector3 dragStartPosition;
     List<GameObject> dragPreviewGameObjects;
 
+    
+
 
 
 	// Use this for initialization
 	void Start () {
         dragPreviewGameObjects = new List<GameObject>();
+        
 
         //preload a bunch of gameobjects to avoid first time lag when creating a bunch at once
         SimplePool.Preload(circleCursorPrefab, 100);
+
+        //Set Camera to the nomial surface - will change a lot in testing
+        Camera.main.transform.Translate(50f, 75f, 0);
     }
 	
 	// Update is called once per frame
@@ -39,16 +45,8 @@ public class MouseController : MonoBehaviour {
         currFramePosition.z = 0; //explicity set to 0, as weird stuff happens when the z gets set the same as the camera, and gets clipped
 
 
-
-
-
         UpdateDragging();
-
-
-
         UpdateCameraMovement();
-
-
 
 
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // as we have moved the camera, we need to check mouse position again
@@ -148,11 +146,33 @@ public class MouseController : MonoBehaviour {
                 for (int y = start_y; y <= end_y; y++) {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
                     if (t != null) {
-                        t.Type = buildModeTile;
+
+                        //// Build a thing!
+                        //// This sets the type of the tile to the currently chosen buildmode tile
+                        //// E.g. if digging, the type is air
+                        //t.Type = buildModeTile;
+
+                        // Instead of that, we are going to make a job and add it to a jobqueue
+                        // TODO: Only allow certain jobs
+                        // Check for replication or overrides (dig on a dig, or dig on a fill)
+                        // Check for legal placement (Dig on air not allowed etc)
+                        // Probably get a buildmodeController or DesignateController or something and do it all there, just calling .BuildIt etc
+
+                        Job job = new Job(t, buildModeTile);
+                        WorldController.Instance.World.jobQueue.Enqueue(job);
+                           
+
+                        // Debug testing FIXME:
+                        Debug.Log("Added job");
+                        
+
+
                     }
                 }
             }
         }
+        
+
 
     }
 

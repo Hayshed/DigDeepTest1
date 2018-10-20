@@ -41,6 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Jobs
+    uniqueID: 2647161389
+    locked: 0
   - name: TileUI
     uniqueID: 3263452953
     locked: 0
