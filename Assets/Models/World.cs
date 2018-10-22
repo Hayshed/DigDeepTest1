@@ -11,9 +11,13 @@ public class World {
     //The tile width and height of the world
     public int Width { get; protected set; }
     public int Height { get; protected set; }
+
+
+    Action<Character> cbCharacterCreated;
+
     public JobQueue jobQueue;
 
-
+    public List<Character> characterList;
 
     /// <summary>
     /// constructor for making a world,
@@ -41,6 +45,25 @@ public class World {
             }
         }
 
+        // Make a list to hold the characters
+        characterList = new List<Character>();
+
+        // Make one character
+        Character c = CreateCharacter(GetTileAt(Width / 2, 1 + 3 * Height / 4));
+        CreateCharacter(GetTileAt(Width / 2 + 1, 1 + 3 * Height / 4));
+        CreateCharacter(GetTileAt(Width / 2 + 2, 1 + 3 * Height / 4));
+        CreateCharacter(GetTileAt(Width / 2 + 4, 1 + 3 * Height / 4));
+        CreateCharacter(GetTileAt(Width / 2 + 5, 1 + 3 * Height / 4));
+        CreateCharacter(GetTileAt(Width / 2 + 6, 1 + 3 * Height / 4));
+
+    }
+    
+    // World updates all relevant objects - updates all characters currently, so they can pull jobs and do work
+    public void Update(float deltaTime) {
+
+        foreach (Character c in characterList) {
+            c.Update(deltaTime);
+        }
 
     }
 
@@ -113,9 +136,29 @@ public class World {
         }
     }
 
+    public Character CreateCharacter(Tile t) {
+
+        Debug.Log("Creating character...");
+        Character c = new Character(t);         // create a new character
+        characterList.Add(c);                   // Add it to the character list to keep track of it
+
+        // Run callback to tell other objects that a character has been created
+        if (cbCharacterCreated != null) {
+            cbCharacterCreated(c);
+            Debug.Log("sending characterCreated callback");
+        }
+        return c;
+    }
+
+    public void RegisterCharacterCreated(Action<Character> callbackfunc) {
+        cbCharacterCreated += callbackfunc;
+    }
+
+    public void UnregisterCharacterCreated(Action<Character> callbackfunc) {
+        cbCharacterCreated -= callbackfunc;
+    }
 
 
-    
 
 
 }

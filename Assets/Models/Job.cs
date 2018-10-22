@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Job  {
 
-    Tile buildTile;         // Tile that will be changed by the job      
+    public Tile buildTile;         // Tile that will be changed by the job      
     TileType jobType;         // The TileType that will be placed there
     float jobTime;          // Nomial time it takes to complete job
 

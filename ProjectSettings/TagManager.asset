@@ -41,6 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Characters
+    uniqueID: 970274717
+    locked: 0
   - name: Jobs
     uniqueID: 2647161389
     locked: 0

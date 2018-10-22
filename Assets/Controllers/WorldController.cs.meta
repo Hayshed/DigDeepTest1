@@ -3,7 +3,9 @@ guid: 3f3548f62db3cd044806cfa71359e744
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - airSprite: {fileID: 21300000, guid: 81595902b2270af43a06e3b970211d0b, type: 3}
+  - dirtSprite: {fileID: 21300000, guid: 7bf47ab2d52433848a3451c85a378a7b, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

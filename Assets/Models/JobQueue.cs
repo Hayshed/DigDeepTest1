@@ -28,7 +28,10 @@ public class JobQueue  {
 
     // Returns a job, taking it out of the queue
     public Job Dequeue() {
-        return jobQueue.Dequeue();
+        if (jobQueue.Count > 0) {
+            return jobQueue.Dequeue();
+        }
+        return null; 
     }
 
     // Lets functions be registered for when a job is created

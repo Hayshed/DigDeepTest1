@@ -136,9 +136,11 @@ public class WorldController : MonoBehaviour {
     }
 
 
-   
+   // Update runs every frame, activating update functions downstream and telling them how much time passed between frames
 	void Update () {
-    
+
+        
+        World.Update(Time.deltaTime);
 		
 	}
 
