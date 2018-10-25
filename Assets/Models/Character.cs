@@ -7,28 +7,30 @@ public class Character {
 
     Tile currTile;              // The current tile the character resides on
     Tile destTile;              // The tile they want to pathfind to
+    Tile nextTile;              // The next tile to move to on the path to the dest tile
     Job myJob;                    // Their current job they want to do
     float speed;                // How many tiles they will move per second
     float movementPercentage;
+    Path_AStar pathAStar;
 
     Action<Character> cbCharacterChanged;
 
     public float X {
         get {
-            return Mathf.Lerp(currTile.X, destTile.X, movementPercentage);
+            return Mathf.Lerp(currTile.X, nextTile.X, movementPercentage);
         }
     }
 
     public float Y {
         get {
-            return Mathf.Lerp(currTile.Y, destTile.Y, movementPercentage);
+            return Mathf.Lerp(currTile.Y, nextTile.Y, movementPercentage);
         }
     }
 
 
     // Constructor
-    public Character(Tile currTile, float speed = 4f) {
-        this.currTile = destTile = currTile;
+    public Character(Tile tile, float speed = 4f) {
+        this.currTile = destTile = nextTile = tile;
         this.speed = speed;
 
         movementPercentage = 0;
@@ -53,25 +55,47 @@ public class Character {
     // Move the character to their destination tile
     // TODO: combine/ restructure Update_move and Update_doJob, once should flow from the other, or maybe both from something else, there's double ups of checks
     void Update_move(float deltaTime) {
+
         if( currTile == destTile) {
-            // We are at the job site, don't move
+            pathAStar = null;
+            return; //We'll already there, don't move
         }
-        else {
-            // not at the job site, so lets move our speed
-            // FIXME: Should only calculate the distance once - but this should be replaced by proper pathfinding anyway
-            float totalDist = Mathf.Sqrt(Mathf.Pow(Mathf.Abs(currTile.X - destTile.X), 2) + Mathf.Pow(Mathf.Abs(currTile.Y - destTile.Y), 2));
-            float distThisTick = speed * deltaTime;
-            movementPercentage = movementPercentage + distThisTick / totalDist;
-
-            // Check if we made it
-            if(movementPercentage >= 1) {
-                currTile = destTile;   // set current tile to the destination tile. We made it and we don't want to move more. destTile will be set anew when picking up a new job
-                movementPercentage = 0; // Reset to 0 ready for next move - TODO: not worrying about overflow for time spent on job yet
+        if (nextTile == null || nextTile == currTile) {
+            // Get the next tile from the pathfinder
+            if (pathAStar == null || pathAStar.Length() == 0) {
+                //Generate a path to our destination
+                pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate a path from curr to dest.
+                if (pathAStar.Length() == 0) {
+                    Debug.LogError("Path_AStar returned no path to destination!");
+                    //FIXME: job should maybe be re-enqueued instead??
+                    AbandonJob();
+                    pathAStar = null;
+                    return;
+                }
             }
+            // Grab the next waypoint from the pathing system
+            nextTile = pathAStar.Dequeue();
 
-
-
+            if (nextTile == currTile) {
+                Debug.LogError("Update_DoMovement -- nextTile is currTile?"); // Fixed by not giving the current tile as the first nextTile
+                
+            }
         }
+
+
+        // not at the job site, so lets move our speed
+        // FIXME: Should only calculate the distance once // use predefined values for diagonals
+        float totalDist = Mathf.Sqrt(Mathf.Pow(Mathf.Abs(currTile.X - nextTile.X), 2) + Mathf.Pow(Mathf.Abs(currTile.Y - nextTile.Y), 2));
+        float distThisTick = speed * deltaTime;
+        movementPercentage = movementPercentage + distThisTick / totalDist;
+
+        // Check if we made it
+        if (movementPercentage >= 1) {
+            currTile = nextTile;   // set current tile to the next tile. We made it and we don't want to move more. nextTile will be set anew when picking up a new job
+            movementPercentage = 0; // Reset to 0 ready for next move - TODO: not worrying about overflow for time spent on job yet
+        }
+
+
 
     }
 
@@ -92,8 +116,20 @@ public class Character {
 
         // Check if the character is actually at the job site
         if (currTile == destTile) {
-            myJob.DoWork(deltaTime);
+            if(myJob != null) {
+                myJob.DoWork(deltaTime);
+            }
+
+            
         }
+
+    }
+
+    public void AbandonJob() {
+        nextTile = destTile = currTile;
+        pathAStar = null;
+        currTile.world.jobQueue.Enqueue(myJob); //TODO: Puts the job back on the jobQueue, might not be best idea??
+        myJob = null;
 
     }
 

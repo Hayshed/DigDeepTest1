@@ -99,8 +99,10 @@ public class WorldController : MonoBehaviour {
 
         }
 
-		
-	}
+        Debug.Log("WorldControler initallse");
+        World.RegisterTileChanged(OnTileTypeChanged);
+
+    }
 
 
     

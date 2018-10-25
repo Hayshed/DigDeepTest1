@@ -12,12 +12,15 @@ public class World {
     public int Width { get; protected set; }
     public int Height { get; protected set; }
 
-
+    Action<Tile> cbTileChanged;
     Action<Character> cbCharacterCreated;
 
     public JobQueue jobQueue;
 
     public List<Character> characterList;
+
+    // The pathfinding graph used to navigate our world map
+    public Path_TileGraph tileGraph;
 
     /// <summary>
     /// constructor for making a world,
@@ -42,19 +45,22 @@ public class World {
             {
                 tiles[x, y] = new Tile(this, x, y);
 
+                tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
+                
+
             }
         }
 
         // Make a list to hold the characters
         characterList = new List<Character>();
 
-        // Make one character
+        // Make some characters - CreateCharacter returns the character, not acutally needed yet
         Character c = CreateCharacter(GetTileAt(Width / 2, 1 + 3 * Height / 4));
-        CreateCharacter(GetTileAt(Width / 2 + 1, 1 + 3 * Height / 4));
-        CreateCharacter(GetTileAt(Width / 2 + 2, 1 + 3 * Height / 4));
-        CreateCharacter(GetTileAt(Width / 2 + 4, 1 + 3 * Height / 4));
-        CreateCharacter(GetTileAt(Width / 2 + 5, 1 + 3 * Height / 4));
-        CreateCharacter(GetTileAt(Width / 2 + 6, 1 + 3 * Height / 4));
+        //CreateCharacter(GetTileAt(Width / 2 + 1, 1 + 3 * Height / 4));
+        //CreateCharacter(GetTileAt(Width / 2 + 2, 1 + 3 * Height / 4));
+        //CreateCharacter(GetTileAt(Width / 2 + 4, 1 + 3 * Height / 4));
+        //CreateCharacter(GetTileAt(Width / 2 + 5, 1 + 3 * Height / 4));
+        //CreateCharacter(GetTileAt(Width / 2 + 6, 1 + 3 * Height / 4));
 
     }
     
@@ -136,6 +142,14 @@ public class World {
         }
     }
 
+    // This should be called whenever a change to the world
+    // means that our old pathfinding info is invalid
+    public void InvalidateTileGraph() {
+        tileGraph = null;
+        Debug.Log("TileGraph set to null");
+    }
+
+
     public Character CreateCharacter(Tile t) {
 
         Debug.Log("Creating character...");
@@ -158,7 +172,25 @@ public class World {
         cbCharacterCreated -= callbackfunc;
     }
 
+    public void RegisterTileChanged(Action<Tile> callbackfunc) {
+        Debug.Log("RegisterTileChanged");
+        cbTileChanged += callbackfunc;
+    }
 
+    public void UnregisterTileChanged(Action<Tile> callbackfunc) {
+        cbTileChanged -= callbackfunc;
+    }
+
+    // Gets called whenever ANY tile changes
+    void OnTileChanged(Tile t) {
+        if (cbTileChanged == null)
+            return;
+
+        cbTileChanged(t);
+        Debug.Log("OnTileChanged");
+        InvalidateTileGraph();
+
+    }
 
 
 }
