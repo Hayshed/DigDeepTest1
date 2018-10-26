@@ -189,4 +189,20 @@ public class Path_AStar  {
         }
         return path.Count;
     }
+
+    // Removes the last tile on the path and returns the second to last (now the last) tile on the path
+    public Tile PathToAdjacentTile() {
+
+
+        path.Reverse();
+        path.Dequeue();
+        Tile t = path.Dequeue();
+        path.Reverse();
+        path.Enqueue(t);
+
+        
+
+        return t;
+
+    }
 }

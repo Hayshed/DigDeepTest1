@@ -26,6 +26,12 @@ public class JobQueue  {
         cbJobCreated(job);          // lets others (JobSpriteController) know that a job has been made that needs to be displayed
     }
 
+
+    //Adds a job to the queue that was previously on it - we don't want to call job created as it was not created, just taken off and put back on the queue
+    public void Requeue(Job job) {
+        jobQueue.Enqueue(job);
+    }
+
     // Returns a job, taking it out of the queue
     public Job Dequeue() {
         if (jobQueue.Count > 0) {
