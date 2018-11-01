@@ -23,7 +23,10 @@ public class JobQueue  {
     // Adds a job to the job queue
     public void Enqueue(Job job) {
         jobQueue.Enqueue(job);      // adds a job to the queue
-        cbJobCreated(job);          // lets others (JobSpriteController) know that a job has been made that needs to be displayed
+        if (cbJobCreated != null) {
+            cbJobCreated(job);          // lets others (JobSpriteController) know that a job has been made that needs to be displayed
+        }
+        
     }
 
 

@@ -191,6 +191,7 @@ public class Path_AStar  {
     }
 
     // Removes the last tile on the path and returns the second to last (now the last) tile on the path
+    // FIXME: Doesn't work, not being used. I'm doing something wrong with enqueuing 
     public Tile PathToAdjacentTile() {
 
 
